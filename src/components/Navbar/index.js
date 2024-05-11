@@ -1,8 +1,14 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { logout, selectIsAuthenticated } from "../../features/slices/authSlice";
+
 
 const NavBar = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch()
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const user = useSelector((state) => state.auth.user);
 
   const handleLoginClick = () => {
     navigate("/login");
@@ -15,6 +21,10 @@ const NavBar = () => {
     navigate("/");
   };
 
+  const handleLogout = () => {
+    dispatch(logout())
+  }
+
   return (
     <div>
       <nav>
@@ -22,8 +32,17 @@ const NavBar = () => {
           <h1 onClick={handleHomeClick}>Contacts</h1>
         </div>
         <div>
-          <button onClick={handleLoginClick}>Login</button>
-          <button onClick={handleRegisterClick}>Register</button>
+          {isAuthenticated ? (
+            <div>
+              <p>{user.name}</p>
+              <button onClick={handleLogout}>logout</button>
+            </div>
+          ) : (
+            <>
+              <button onClick={handleLoginClick}>Login</button>
+              <button onClick={handleRegisterClick}>Register</button>
+            </>
+          )}
         </div>
       </nav>
     </div>
