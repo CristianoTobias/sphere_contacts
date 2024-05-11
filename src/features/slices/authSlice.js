@@ -29,7 +29,7 @@ const initialState = {
   isAuthenticated: accessToken !== null,
 };
 
-const apiUrl = "http://127.0.0.1:8000";
+const apiUrl = process.env.REACT_APP_API_URL;
 
 // Slice de autenticação
 const authSlice = createSlice({

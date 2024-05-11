@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const apiUrl = "http://127.0.0.1:8000";
+const apiUrl = process.env.REACT_APP_API_URL;
 
 // Função assíncrona para buscar todos os contatos
 export const fetchContacts = createAsyncThunk(
