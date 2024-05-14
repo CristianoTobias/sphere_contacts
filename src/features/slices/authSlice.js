@@ -75,7 +75,7 @@ export const { loginStart, loginSuccess, loginFailure, logoutSuccess } =
 export const login = (credential) => async (dispatch) => {
   try {
     dispatch(loginStart());
-    const response = await axios.post(`${apiUrl}token/`, credential);
+    const response = await axios.post(`${apiUrl}/token/`, credential);
     const accessToken = response.data.access;
     const refreshToken = response.data.refresh;
     const decodedToken = jwtDecode(accessToken);

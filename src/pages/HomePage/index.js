@@ -1,18 +1,25 @@
-// Criando a página HomePage
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchContacts, getContactsError, getContactsStatus, selectAllContacts } from "../../features/slices/contactsSlice";
+import {
+  fetchContacts,
+  getContactsError,
+  getContactsStatus,
+  selectAllContacts,
+  setContactsFilter,
+} from "../../features/slices/contactsSlice";
 import PersonalContact from "../../components/PersonalView";
-import SidePanel from "../../components/SidePanel";
-import AddContactForm from "../../components/addContact";
 import ContactsViews from "../../components/ContactsViews";
-
+import ButtonAddContact from "../../components/ButtonAddContact";
+import { HomePageContainer, LeftPanel, RightPanel, Message } from "./styles"; // Importe o componente Message
+import GlobalStyles from "../../GlobalStyles";
+import { selectIsAuthenticated } from "../../features/slices/authSlice";
 
 const HomePage = () => {
   const dispatch = useDispatch();
   const contacts = useSelector(selectAllContacts);
   const contactsStatus = useSelector(getContactsStatus);
   const errors = useSelector(getContactsError);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
 
   useEffect(() => {
     if (contactsStatus === "idle") {
@@ -21,23 +28,41 @@ const HomePage = () => {
   }, [dispatch, contactsStatus]);
 
   let content;
-  if (contactsStatus === "loading") {
+  if (!isAuthenticated) {
+    // Renderiza a mensagem se nenhum usuário estiver autenticado
+    content = (
+      <Message>
+        Welcome to our website. Please login or register to access the content.
+      </Message>
+    );
+  } else if (contactsStatus === "loading") {
     content = <div>Loading...</div>;
   } else if (contactsStatus === "succeeded") {
-    content = contacts.map((contact) => (
-      <ContactsViews key={contact.id} contact={contact} />
-    ));
+    content = (
+      <ContactsViews
+        contacts={contacts}
+        handleContactClick={(id) => dispatch(setContactsFilter(id))}
+      />
+    );
   } else if (contactsStatus === "failed") {
-    content = <p>Failed {errors} </p>;
+    content = <Message>Failed to load contacts: {errors}</Message>;
   }
 
   return (
-    <div>
-      <div>{content}</div>
-      <AddContactForm />
-      <PersonalContact />
-      <SidePanel />
-    </div>
+    <>
+      <GlobalStyles />
+      <HomePageContainer>
+        {/* Renderiza o botão de adicionar contato apenas se o usuário estiver autenticado */}
+        <LeftPanel isAuthenticated={isAuthenticated}>
+          <div>{content}</div>
+          {isAuthenticated && <ButtonAddContact />}
+        </LeftPanel>
+        {/* Renderiza o RightPanel apenas se o usuário estiver autenticado */}
+        <RightPanel isAuthenticated={isAuthenticated}>
+          {isAuthenticated && <PersonalContact />}
+        </RightPanel>
+      </HomePageContainer>
+    </>
   );
 };
 
