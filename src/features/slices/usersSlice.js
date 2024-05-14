@@ -6,7 +6,7 @@ const apiUrl = process.env.REACT_APP_API_URL;
 const initialState = [];
 
 export const fetchUsers = createAsyncThunk("user/fetchUsers", async () => {
-  const response = await axios.get(`${apiUrl}users/`);
+  const response = await axios.get(`${apiUrl}/users/`);
   return response.data;
 });
 
