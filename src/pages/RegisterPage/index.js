@@ -1,8 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 import axios from "axios";
+import {
+  RegisterContainer,
+  Title,
+  ErrorMessage,
+  SuccessMessage,
+  Form,
+  Label,
+  Input,
+  CheckboxContainer,
+  CheckboxLabel,
+  Button,
+  LoginLink,
+  LinkText,
+} from "./styles";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -41,13 +55,57 @@ const Register = () => {
   }, [successMsg, navigate]);
 
   const apiUrl = "http://localhost:8000";
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrMsg("");
     setSuccessMsg("");
 
+    // Verifica se as senhas coincidem
     if (password !== confirmPassword) {
       setErrMsg("Passwords do not match!");
+      return;
+    }
+
+    // Verificar se a senha tem pelo menos 8 caracteres
+    if (password.length < 8) {
+      setErrMsg("Password must be at least 8 characters long!");
+      return;
+    }
+    // Verificar se a senha contém pelo menos um caractere especial
+    const specialChars = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/;
+    if (!specialChars.test(password)) {
+      setErrMsg("Password must contain at least one special character!");
+      return;
+    }
+    // Verificar se a senha contém partes do nome de usuário
+    const usernameParts = username.split(/[@/./+/-/_]/);
+    for (const part of usernameParts) {
+      if (
+        part.length > 0 &&
+        password.toLowerCase().includes(part.toLowerCase())
+      ) {
+        setErrMsg("Password cannot contain parts of your username!");
+        return;
+      }
+    }
+
+    // Verificar se a senha não é apenas números
+    if (/^\d+$/.test(password)) {
+      setErrMsg("Password cannot be entirely numeric!");
+      return;
+    }
+
+    // Verificar se a senha não é muito semelhante ao nome de usuário
+    if (password.toLowerCase().includes(username.toLowerCase())) {
+      setErrMsg("Password cannot contain your username!");
+      return;
+    }
+
+    // Verificar o formato do username
+    const usernameRegex = /^[a-zA-Z0-9@/./+/-/_]{1,150}$/;
+    if (!usernameRegex.test(username)) {
+      setErrMsg("Invalid username format!");
       return;
     }
 
@@ -73,67 +131,68 @@ const Register = () => {
   };
 
   return (
-    <div>
-      <div>
-        <h3>Register</h3>
-        <div>
-          {errMsg && (
-            <div>
-              <Stack sx={{ width: "100%" }} spacing={2}>
-                <Alert severity="error">{errMsg}</Alert>
-              </Stack>
-            </div>
-          )}
-
-          {successMsg && (
-            <div>
-              <Stack sx={{ width: "100%" }} spacing={2}>
-                <Alert severity="success">{successMsg}</Alert>
-              </Stack>
-            </div>
-          )}
-        </div>
-        <form onSubmit={handleSubmit}>
-          <label>Username:</label>
+    <RegisterContainer>
+      <Title>Register</Title>
+      {errMsg && (
+        <ErrorMessage>
+          <Stack sx={{ width: "100%" }} spacing={2}>
+            <Alert severity="error">{errMsg}</Alert>
+          </Stack>
+        </ErrorMessage>
+      )}
+      {successMsg && (
+        <SuccessMessage>
+          <Stack sx={{ width: "100%" }} spacing={2}>
+            <Alert severity="success">{successMsg}</Alert>
+          </Stack>
+        </SuccessMessage>
+      )}
+      <Form onSubmit={handleSubmit}>
+        <Label>Username:</Label>
+        <Input
+          type="text"
+          name="username"
+          onChange={handleInputUsername}
+          value={username}
+          required
+          disabled={successMsg !== ""}
+        />
+        <Label>Password:</Label>
+        <Input
+          type={check ? "text" : "password"}
+          name="password"
+          onChange={handleInputPassword}
+          value={password}
+          required
+          disabled={successMsg !== ""}
+        />
+        <Label>Confirm Password:</Label>
+        <Input
+          type={check ? "text" : "password"}
+          name="confirm-password"
+          onChange={handleInputconfirmPassword}
+          value={confirmPassword}
+          required
+          disabled={successMsg !== ""}
+        />
+        <CheckboxContainer>
           <input
-            type="text"
-            name="username"
-            onChange={handleInputUsername}
-            value={username}
-            required
+            type="checkbox"
+            checked={check}
+            onChange={togglePasswordVisibility}
+            disabled={successMsg !== ""}
           />
-          <label>Password:</label>
-          <input
-            type={check ? "text" : "password"}
-            name="password"
-            onChange={handleInputPassword}
-            value={password}
-            required
-          />
-          <label>Confirm Password:</label>
-          <input
-            type={check ? "text" : "password"}
-            name="confirm-password"
-            onChange={handleInputconfirmPassword}
-            value={confirmPassword}
-            required
-          />
-          <div>
-            <label>Show password</label>
-            <input
-              type="checkbox"
-              checked={check}
-              onChange={togglePasswordVisibility}
-            />
-          </div>
-          <button>Register</button>
-        </form>
-        <p>
-          Already have an account?
-          <Link to="/login">Log in</Link>
-        </p>
-      </div>
-    </div>
+          <CheckboxLabel>Show password</CheckboxLabel>
+        </CheckboxContainer>
+        <Button type="submit" disabled={successMsg !== ""}>
+          {successMsg ? "Registered!" : "Register"}
+        </Button>
+      </Form>
+      <LoginLink>
+        Already have an account?
+        <LinkText to="/login">Log in</LinkText>
+      </LoginLink>
+    </RegisterContainer>
   );
 };
 
