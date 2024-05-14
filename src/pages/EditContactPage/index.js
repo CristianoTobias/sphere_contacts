@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectFilteredContactById,
@@ -24,10 +24,10 @@ const capitalizeName = (fullName) => {
   return capitalizedParts.join(" ");
 };
 
-const EditContactPage = ({ navigate }) => { // Receive navigate function as prop
+const EditContactPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-
+  const navigate = useNavigate()
   const contact = useSelector((state) => selectFilteredContactById(state, id));
 
   const [name, setName] = useState("");
@@ -58,9 +58,7 @@ const EditContactPage = ({ navigate }) => { // Receive navigate function as prop
     if (!value) {
       setNameError("Name is required");
     } else if (!/^[A-Za-z]{3,}/.test(value)) {
-      setNameError(
-        "Name must start with a letter and have at least three letters"
-      );
+      setNameError("Name must start with a letter and have at least three letters");
     } else {
       setNameError("");
     }
@@ -89,14 +87,19 @@ const EditContactPage = ({ navigate }) => { // Receive navigate function as prop
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     const capitalizedName = capitalizeName(name);
+
+    // Reset error states
+    setNameError("");
+    setEmailError("");
+    setTelefoneError("");
+
     validateName(capitalizedName);
     validateEmail(email);
     validateTelefone(telefone);
+
     if (!nameError && !emailError && !telefoneError) {
       try {
-        await dispatch(
-          updateContact({ id, name: capitalizedName, email, telefone })
-        );
+        await dispatch(updateContact({ id, name: capitalizedName, email, telefone })).unwrap();
         navigate(`/`);
       } catch (error) {
         console.error("Error updating contact:", error);
@@ -123,8 +126,9 @@ const EditContactPage = ({ navigate }) => { // Receive navigate function as prop
             name="name"
             value={name}
             onChange={(e) => {
-              setName(e.target.value);
-              validateName(e.target.value);
+              const newName = e.target.value;
+              setName(newName);
+              validateName(newName);
             }}
             required
           />
@@ -138,12 +142,13 @@ const EditContactPage = ({ navigate }) => { // Receive navigate function as prop
             name="email"
             value={email}
             onChange={(e) => {
-              setEmail(e.target.value);
-              validateEmail(e.target.value);
+              const newEmail = e.target.value;
+              setEmail(newEmail);
+              validateEmail(newEmail);
             }}
             required
           />
-          <ErrorMessage> {emailError}</ErrorMessage>
+          <ErrorMessage>{emailError}</ErrorMessage>
         </FormGroup>
         <FormGroup>
           <Label htmlFor="telefone">Telefone:</Label>
@@ -151,13 +156,14 @@ const EditContactPage = ({ navigate }) => { // Receive navigate function as prop
             mask="(99)99999-9999"
             value={telefone}
             onChange={(e) => {
-              setTelefone(e.target.value);
-              validateTelefone(e.target.value);
+              const newTelefone = e.target.value;
+              setTelefone(newTelefone);
+              validateTelefone(newTelefone);
             }}
           >
             {(inputProps) => <Input {...inputProps} />}
           </InputMask>
-          <ErrorMessage> {telefoneError}</ErrorMessage>
+          <ErrorMessage>{telefoneError}</ErrorMessage>
         </FormGroup>
         <Button type="submit">Save</Button>
         <ButtonCancel type="button" onClick={handleCancel}>
