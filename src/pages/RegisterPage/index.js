@@ -54,7 +54,7 @@ const Register = () => {
     return () => clearTimeout(timer);
   }, [successMsg, navigate]);
 
-  const apiUrl = "http://localhost:8000";
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
