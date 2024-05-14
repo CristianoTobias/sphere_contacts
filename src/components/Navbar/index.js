@@ -1,14 +1,30 @@
-import React from "react";
+// Navbar.js
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { logout, selectIsAuthenticated } from "../../features/slices/authSlice";
-
+import {
+  NavContainer,
+  Logo,
+  UserInfo,
+  UserName,
+  ButtonContainer,
+  LogoutButton,
+  AuthButton,
+} from "./styles"; // Importação corrigida para o arquivo de estilos
 
 const NavBar = () => {
+  const [showButtons, setShowButtons] = useState(true);
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const user = useSelector((state) => state.auth.user);
+  const location = useLocation();
+
+  useEffect(() => {
+    // Verifica se o usuário está na página de login ou de registro
+    setShowButtons(location.pathname !== "/login" && location.pathname !== "/register");
+  }, [location.pathname]); // Atualiza quando a localização da página mudar
 
   const handleLoginClick = () => {
     navigate("/login");
@@ -17,35 +33,34 @@ const NavBar = () => {
   const handleRegisterClick = () => {
     navigate("/register");
   };
-  const handleHomeClick = () => {
-    navigate("/");
-  };
 
   const handleLogout = () => {
-    dispatch(logout())
-  }
+    dispatch(logout());
+  };
 
   return (
-    <div>
-      <nav>
-        <div>
-          <h1 onClick={handleHomeClick}>Contacts</h1>
-        </div>
-        <div>
-          {isAuthenticated ? (
-            <div>
-              <p>{user.name}</p>
-              <button onClick={handleLogout}>logout</button>
-            </div>
-          ) : (
-            <>
-              <button onClick={handleLoginClick}>Login</button>
-              <button onClick={handleRegisterClick}>Register</button>
-            </>
-          )}
-        </div>
-      </nav>
-    </div>
+    <NavContainer>
+      <Logo> My Contacts</Logo>
+      <UserInfo>
+        {isAuthenticated ? (
+          <>
+            <UserName>{user.name}</UserName> {/* Exibe o nome do usuário */}
+            <ButtonContainer className={showButtons ? "show" : "hide"}>
+              <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
+            </ButtonContainer>
+          </>
+        ) : (
+          <ButtonContainer className={showButtons ? "show" : "hide"}>
+            {showButtons && (
+              <>
+                <AuthButton onClick={handleLoginClick}>Login</AuthButton>
+                <AuthButton onClick={handleRegisterClick}>Register</AuthButton>
+              </>
+            )}
+          </ButtonContainer>
+        )}
+      </UserInfo>
+    </NavContainer>
   );
 };
 
