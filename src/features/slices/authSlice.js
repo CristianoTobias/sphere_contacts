@@ -100,7 +100,7 @@ export const logout = () => (dispatch) => {
 export const refreshAccessToken = () => async (dispatch, getState) => {
   try {
     const newRefreshToken = cookies.get("refreshToken");
-    const response = await axios.post(`${apiUrl}/token/refresh/`, {
+    const response = await axios.post(`${apiUrl}token/refresh/`, {
       refresh: newRefreshToken,
     });
     const accessToken = response.data.access;
