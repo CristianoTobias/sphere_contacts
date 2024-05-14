@@ -75,7 +75,7 @@ export const { loginStart, loginSuccess, loginFailure, logoutSuccess } =
 export const login = (credential) => async (dispatch) => {
   try {
     dispatch(loginStart());
-    const response = await axios.post(`${apiUrl}token/`, credential);
+    const response = await axios.post(`${apiUrl}/token/`, credential);
     const accessToken = response.data.access;
     const refreshToken = response.data.refresh;
     const decodedToken = jwtDecode(accessToken);
@@ -100,7 +100,7 @@ export const logout = () => (dispatch) => {
 export const refreshAccessToken = () => async (dispatch, getState) => {
   try {
     const newRefreshToken = cookies.get("refreshToken");
-    const response = await axios.post(`${apiUrl}token/refresh/`, {
+    const response = await axios.post(`${apiUrl}/token/refresh/`, {
       refresh: newRefreshToken,
     });
     const accessToken = response.data.access;
