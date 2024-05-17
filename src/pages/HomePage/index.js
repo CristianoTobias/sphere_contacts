@@ -20,12 +20,13 @@ const HomePage = () => {
   const contactsStatus = useSelector(getContactsStatus);
   const errors = useSelector(getContactsError);
   const isAuthenticated = useSelector(selectIsAuthenticated);
+  
 
   useEffect(() => {
-    if (contactsStatus === "idle") {
+    if (isAuthenticated && contactsStatus === "idle") {
       dispatch(fetchContacts());
     }
-  }, [dispatch, contactsStatus]);
+  }, [dispatch, isAuthenticated, contactsStatus]);
 
   let content;
   if (!isAuthenticated) {

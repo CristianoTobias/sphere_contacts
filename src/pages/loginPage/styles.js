@@ -1,22 +1,27 @@
-// LoginStyles.js
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
 export const LoginContainer = styled.div`
-  max-width: 300px; /* Largura máxima do formulário */
-  margin: 120px auto; /* Centraliza o formulário na tela e adiciona espaçamento em cima e embaixo */
-  padding: 20px; /* Espaçamento interno */
-  border: 1px solid #ccc; /* Borda do formulário */
-  border-radius: 5px; /* Bordas arredondadas */
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+  padding: 20px;
+  margin-top: 100px; /* Adicionado espaçamento superior */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   background-color: #f0f0f0;
+  color: #1E395B;
 `;
 
-export const Title = styled.h3`
-  margin-bottom: 20px; /* Espaçamento abaixo do título */
+export const Title = styled.h2`
+  margin-bottom: 20px;
+  text-align: center;
 `;
 
 export const ErrorMessage = styled.div`
-  margin-bottom: 20px; /* Espaçamento abaixo da mensagem de erro */
+  color: red;
+  margin-bottom: 10px;
 `;
 
 export const Form = styled.form`
@@ -25,47 +30,60 @@ export const Form = styled.form`
 `;
 
 export const Label = styled.label`
-  margin-bottom: 5px; /* Espaçamento abaixo do label */
+  margin-bottom: 5px;
+  font-weight: bold;
 `;
 
 export const Input = styled.input`
-  padding: 8px; /* Espaçamento interno */
-  margin-bottom: 10px; /* Espaçamento abaixo do input */
-  border: 1px solid #ccc; /* Borda do input */
-  border-radius: 3px; /* Bordas arredondadas */
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 `;
 
 export const CheckboxContainer = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 10px; /* Espaçamento abaixo do checkbox */
+  margin-bottom: 10px;
 `;
 
 export const CheckboxLabel = styled.label`
-  margin-left: 5px; /* Espaçamento à esquerda do label */
+  margin-left: 5px;
 `;
 
 export const Button = styled.button`
-  background-color: #007bff; /* Cor de fundo do botão */
-  color: #fff; /* Cor do texto no botão */
-  border: none; /* Remover borda */
-  padding: 8px 15px; /* Espaçamento interno */
-  cursor: pointer; /* Altera o cursor para indicar que é clicável */
-  border-radius: 3px; /* Bordas arredondadas */
-  
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  width: 200px;
+  margin: 0 auto;
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
 `;
 
-export const RegisterLink = styled.p`
-  margin-top: 20px; /* Espaçamento acima do link de registro */
+export const RegisterLink = styled.div`
+  margin-top: 20px;
+  text-align: center;
 `;
 
 export const LinkText = styled(Link)`
-  color: #007bff; /* Cor do link */
-  text-decoration: none; /* Remove o sublinhado do link */
-  margin-left: 5px; /* Espaçamento à esquerda do link */
+  color: #007bff;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
 `;
-export const ErrorParagraph = styled.p`
-  color: red; /* Cor do texto vermelho para mensagens de erro */
-  font-size: 14px; /* Tamanho da fonte */
-  margin-top: 5px; /* Espaçamento acima da mensagem de erro */
+export const Error = styled.p`
+  height: 20px;
+`;
+export const SuccessMessage = styled.div`
+  color: green;
+  margin: 10px 0;
 `;

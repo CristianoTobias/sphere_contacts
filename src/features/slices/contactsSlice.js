@@ -1,23 +1,63 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import { selectAccessToken, refreshAccessToken } from "../../features/slices/authSlice";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
-// Função assíncrona para buscar todos os contatos
 export const fetchContacts = createAsyncThunk(
   "contacts/fetchContacts",
-  async () => {
-    const response = await axios.get(apiUrl);
-    return response.data;
+  async (_, { getState, rejectWithValue, dispatch }) => {
+    try {
+      const state = getState();
+      let token = selectAccessToken(state);
+      
+      // Verifica se o token de acesso está presente e não expirou
+      if (!token) {
+        throw new Error("Token de acesso não encontrado.");
+      }
+
+      const response = await axios.get(`${apiUrl}/user-contacts/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!Array.isArray(response.data)) {
+        throw new Error("A resposta não é uma lista de contatos.");
+      }
+
+      return response.data;
+    } catch (error) {
+      // Verifica se o erro é de token inválido ou expirado
+      if (error.response?.data?.code === "token_not_valid") {
+        try {
+          // Tenta obter um novo token de acesso usando o token de atualização
+          await dispatch(refreshAccessToken());
+         // Tenta fazer a solicitação novamente após atualizar o token
+          return dispatch(fetchContacts());
+        } catch (refreshError) {
+          const errorMessage = refreshError.response?.data || refreshError.message;
+          console.log(errorMessage);
+          return rejectWithValue(errorMessage);
+        }
+      } else {
+        const errorMessage = error.response?.data || error.message;
+        console.log(errorMessage);
+        return rejectWithValue(errorMessage);
+      }
+    }
   }
 );
-
 // Função assíncrona para adicionar um novo contato
 export const addNewContact = createAsyncThunk(
   "contacts/addNewContact",
-  async (contactData) => {
+  async ({ token, ...contactData }) => { // Desestruturando o token do restante dos dados
     try {
-      const response = await axios.post(`${apiUrl}/add_contact/`, contactData);
+      const response = await axios.post(`${apiUrl}/add_contact/`, contactData, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Enviando o token no cabeçalho de autorização
+        },
+      });
       return response.data;
     } catch (error) {
       console.error("Error adding new contact:", error);
@@ -29,9 +69,15 @@ export const addNewContact = createAsyncThunk(
 // Função assíncrona para remover um contato pelo ID
 export const removeContact = createAsyncThunk(
   "contacts/removeContact",
-  async (contactId) => {
+  async (contactId, { getState }) => {
     try {
-      await axios.delete(`${apiUrl}/delete_contact/${contactId}`);
+      const accessToken = selectAccessToken(getState()); // Obtém o token de acesso do estado global
+      const config = {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      };
+      await axios.delete(`${apiUrl}/delete_contact/${contactId}`, config);
       return contactId; // Retorna o ID do contato excluído
     } catch (error) {
       console.error("Error removing contact:", error);
@@ -43,7 +89,8 @@ export const removeContact = createAsyncThunk(
 // Função assíncrona para atualizar um contato no backend e no Redux
 export const updateContact = createAsyncThunk(
   "contacts/updateContact",
-  async (updatedContact) => {
+  async ({ token, ...updatedContact }) => { // Desestruturando o token do restante dos dados do contato
+    console.log(updateContact)
     try {
       // Faz uma solicitação PUT para atualizar o contato no backend
       const response = await axios.put(

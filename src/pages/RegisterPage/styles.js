@@ -1,78 +1,81 @@
-// RegisterStyles.js
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
 export const RegisterContainer = styled.div`
-  max-width: 300px; /* Largura máxima do formulário */
-  margin: 120px auto; /* Centraliza o formulário na tela e ajusta a margem superior e inferior */
-  padding: 20px; /* Espaçamento interno */
-  border: 1px solid #ccc; /* Borda do formulário */
-  border-radius: 5px; /* Bordas arredondadas */
-  background-color:  #f0f0f0;
-
+  max-width: 400px;
+  margin: 100px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f0f0f0;
+  color: #1E395B;
 `;
 
-export const Title = styled.h3`
-  margin-bottom: 20px; /* Espaçamento abaixo do título */
+export const Title = styled.h2`
+  margin-bottom: 15px;
+  text-align: center;
+`;
+
+export const Error = styled.p`
+  height: 20px;
 `;
 
 export const ErrorMessage = styled.div`
-  margin-top: 20px; /* Espaçamento acima da mensagem de erro */
-  font-size: 14px; /* Reduz o tamanho da fonte da mensagem de erro */
+  color: red;
 `;
 
 export const SuccessMessage = styled.div`
-  margin-top: 20px; /* Espaçamento acima da mensagem de sucesso */
-  font-size: 14px; /* Reduz o tamanho da fonte da mensagem de sucesso */
+  color: green;
 `;
 
 export const Form = styled.form`
   display: flex;
   flex-direction: column;
-  padding: 0; /* Removendo o padding interno do formulário */
+  padding: 0;
 `;
 
 export const Label = styled.label`
-  margin-bottom: 5px; /* Espaçamento abaixo do label */
+  margin-bottom: 5px;
 `;
 
 export const Input = styled.input`
-  padding: 8px; /* Espaçamento interno */
-  margin-bottom: 10px; /* Espaçamento abaixo do input */
-  border: 1px solid #ccc; /* Borda do input */
-  border-radius: 3px; /* Bordas arredondadas */
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
 `;
 
 export const CheckboxContainer = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 10px; /* Espaçamento abaixo do checkbox */
+  margin-bottom: 5px;
 `;
 
 export const CheckboxLabel = styled.label`
-  margin-left: 5px; /* Espaçamento à esquerda do label */
+  margin-left: 5px;
 `;
 
 export const Button = styled.button`
-  background-color: #007bff; /* Cor de fundo do botão */
-  color: #fff; /* Cor do texto no botão */
-  border: none; /* Remover borda */
-  padding: 8px 15px; /* Espaçamento interno */
-  cursor: pointer; /* Altera o cursor para indicar que é clicável */
-  border-radius: 3px; /* Bordas arredondadas */
-  transition: background-color 0.3s; /* Transição suave de cor de fundo */
-
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 8px 15px; /* Reduzindo o padding horizontal do botão */
+  cursor: pointer;
+  border-radius: 3px;
+  width: 200px;
+  margin: 0 auto;
+  transition: background-color 0.3s;
   &:hover {
-    background-color: #0056b3; /* Cor de fundo do botão ao passar o mouse */
+    background-color: #0056b3;
   }
 `;
 
 export const LoginLink = styled.p`
-  margin-top: 20px; /* Espaçamento acima do link de login */
+  margin-top: 10px;
 `;
 
 export const LinkText = styled(Link)`
-  color: #007bff; /* Cor do link */
-  text-decoration: none; /* Remove o sublinhado do link */
-  margin-left: 5px; /* Espaçamento à esquerda do link */
+  color: #007bff;
+  text-decoration: none;
+  margin-left: 5px;
 `;

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { selectAccessToken } from "../../features/slices/authSlice"; // Importe os seletores necessários
 import {
   selectFilteredContactById,
   updateContact,
@@ -27,16 +28,17 @@ const capitalizeName = (fullName) => {
 const EditContactPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const contact = useSelector((state) => selectFilteredContactById(state, id));
+  const accessToken = useSelector(selectAccessToken); // Obtém o token de acesso do estado global
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [telefone, setTelefone] = useState("");
+  const [phone, setTelefone] = useState("");
 
   const [originalName, setOriginalName] = useState("");
   const [originalEmail, setOriginalEmail] = useState("");
-  const [originalTelefone, setOriginalTelefone] = useState("");
+  const [originalPhone, setOriginalTelefone] = useState("");
 
   const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -46,11 +48,11 @@ const EditContactPage = () => {
     if (contact) {
       setName(contact.name || "");
       setEmail(contact.email || "");
-      setTelefone(contact.telefone || "");
+      setTelefone(contact.phone || "");
 
       setOriginalName(contact.name || "");
       setOriginalEmail(contact.email || "");
-      setOriginalTelefone(contact.telefone || "");
+      setOriginalTelefone(contact.phone || "");
     }
   }, [contact]);
 
@@ -58,7 +60,9 @@ const EditContactPage = () => {
     if (!value) {
       setNameError("Name is required");
     } else if (!/^[A-Za-z]{3,}/.test(value)) {
-      setNameError("Name must start with a letter and have at least three letters");
+      setNameError(
+        "Name must start with a letter and have at least three letters"
+      );
     } else {
       setNameError("");
     }
@@ -88,6 +92,15 @@ const EditContactPage = () => {
     e.preventDefault();
     const capitalizedName = capitalizeName(name);
 
+    // Adiciona o token de acesso como parte dos dados do novo contato
+    const contactDataWithToken = {
+      ...contact,
+      name: capitalizedName,
+      email: email, // Adiciona o email atualizado
+      phone: phone,
+      token: accessToken,
+    };
+
     // Reset error states
     setNameError("");
     setEmailError("");
@@ -95,11 +108,11 @@ const EditContactPage = () => {
 
     validateName(capitalizedName);
     validateEmail(email);
-    validateTelefone(telefone);
-
+    validateTelefone(phone);
+    console.log(contactDataWithToken)
     if (!nameError && !emailError && !telefoneError) {
       try {
-        await dispatch(updateContact({ id, name: capitalizedName, email, telefone })).unwrap();
+        await dispatch(updateContact(contactDataWithToken));
         navigate(`/`);
       } catch (error) {
         console.error("Error updating contact:", error);
@@ -110,7 +123,7 @@ const EditContactPage = () => {
   const handleCancel = () => {
     setName(originalName);
     setEmail(originalEmail);
-    setTelefone(originalTelefone);
+    setTelefone(originalPhone);
     navigate(`/`);
   };
 
@@ -151,14 +164,14 @@ const EditContactPage = () => {
           <ErrorMessage>{emailError}</ErrorMessage>
         </FormGroup>
         <FormGroup>
-          <Label htmlFor="telefone">Telefone:</Label>
+          <Label htmlFor="phone">Telefone:</Label>
           <InputMask
             mask="(99)99999-9999"
-            value={telefone}
+            value={phone}
             onChange={(e) => {
-              const newTelefone = e.target.value;
-              setTelefone(newTelefone);
-              validateTelefone(newTelefone);
+              const newPhone = e.target.value;
+              setTelefone(newPhone);
+              validateTelefone(newPhone);
             }}
           >
             {(inputProps) => <Input {...inputProps} />}

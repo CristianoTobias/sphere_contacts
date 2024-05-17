@@ -7,6 +7,7 @@ import {
   AlphabetBar,
   AlphabetLetter,
   ContactName,
+  NoContacts,
 } from "./styles";
 
 const ContactsViews = ({ contacts, handleContactClick }) => {
@@ -15,7 +16,6 @@ const ContactsViews = ({ contacts, handleContactClick }) => {
   const handleSearch = (term) => {
     setSearchTerm(term);
     handleContactClick("");
-
   };
 
   const filteredContacts = contacts.filter((contact) =>
@@ -34,6 +34,7 @@ const ContactsViews = ({ contacts, handleContactClick }) => {
       letterElement.scrollIntoView({ behavior: "smooth" });
     }
   };
+
   const handleLetterClick = () => {
     setSearchTerm("");
     handleContactClick("");
@@ -48,28 +49,33 @@ const ContactsViews = ({ contacts, handleContactClick }) => {
         onChange={(e) => handleSearch(e.target.value)}
       />
       <ContactsContainer className="contacts-container">
-        <ContactItemContainer>
-          {alphabetArray.map((letter) => (
-            <div key={letter} id={letter}>
-              <LetterHeader>{letter}</LetterHeader>
-              {filteredContacts
-                .filter(
-                  (contact) => contact.name.charAt(0).toUpperCase() === letter
-                )
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .map((contact) => (
-                  <div
-                    key={contact.id}
-                    onClick={() => {
-                      handleContactClick(contact.id);
-                    }}
-                  >
-                    <ContactName>{contact.name}</ContactName>
-                  </div>
-                ))}
-            </div>
-          ))}
-        </ContactItemContainer>
+        {filteredContacts.length === 0 ? (
+          <NoContacts>No contacts registered.</NoContacts>
+        ) : (
+          <ContactItemContainer>
+            {alphabetArray.map((letter) => (
+              <div key={letter} id={letter}>
+                <LetterHeader>{letter}</LetterHeader>
+                {filteredContacts
+                  .filter(
+                    (contact) =>
+                      contact.name.charAt(0).toUpperCase() === letter
+                  )
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .map((contact) => (
+                    <div
+                      key={contact.id}
+                      onClick={() => {
+                        handleContactClick(contact.id);
+                      }}
+                    >
+                      <ContactName>{contact.name}</ContactName>
+                    </div>
+                  ))}
+              </div>
+            ))}
+          </ContactItemContainer>
+        )}
         <AlphabetBar>
           {Array.from({ length: 26 }, (_, index) => {
             const letter = String.fromCharCode(65 + index);

@@ -55,6 +55,7 @@ export const AlphabetBar = styled.div`
   width: 20px;
   flex-direction: column;
   margin-left: 20px;
+  margin-top: -30px;
 `;
 
 export const AlphabetLetter = styled.div`
@@ -73,4 +74,11 @@ export const ContactName = styled.p`
   cursor: pointer;
   border-bottom: 1px solid #333333;
   font-weight: bolder;
+`;
+
+export const NoContacts = styled.p`
+  font-size: 16px;
+  color: #555;
+  margin-top: 10px;
+  width: 100%;
 `;

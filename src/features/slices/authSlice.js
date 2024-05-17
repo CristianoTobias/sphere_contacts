@@ -41,7 +41,7 @@ const authSlice = createSlice({
       state.error = null;
     },
     loginSuccess: (state, action) => {
-      const timers = 60 * 84600;
+      const timers = 60000 * 84600;
       const { user, accessToken, refreshToken } = action.payload;
       state.user = user;
       state.accessToken = accessToken;
@@ -72,26 +72,27 @@ const authSlice = createSlice({
 export const { loginStart, loginSuccess, loginFailure, logoutSuccess } =
   authSlice.actions;
 
-export const login = (credential) => async (dispatch) => {
-  try {
-    dispatch(loginStart());
-    const response = await axios.post(`${apiUrl}/token/`, credential);
-    const accessToken = response.data.access;
-    const refreshToken = response.data.refresh;
-    const decodedToken = jwtDecode(accessToken);
-    dispatch(loginSuccess({ user: decodedToken, accessToken, refreshToken }));
-    const timer = 240;
-    const interValid = setInterval(() => {
-      dispatch(refreshAccessToken());
-    }, timer * 1000);
-    dispatch({ type: "SET_INTERVAL_ID", payload: interValid });
-  } catch (error) {
-    const message =
-      error.response?.data?.detail || "Um erro desconhecido ocorreu";
-    dispatch(loginFailure(message));
-    throw error;
-  }
-};
+  export const login = (credential) => async (dispatch) => {
+    try {
+      dispatch(loginStart());
+      const response = await axios.post(`${apiUrl}/token/`, credential);
+      const accessToken = response.data.access;
+      const refreshToken = response.data.refresh;
+      const decodedToken = jwtDecode(accessToken);
+  
+      dispatch(loginSuccess({ user: decodedToken, accessToken, refreshToken }));
+      const timer = 240;
+      const interValid = setInterval(() => {
+        dispatch(refreshAccessToken());
+      }, timer * 1000);
+      dispatch({ type: "SET_INTERVAL_ID", payload: interValid });
+    } catch (error) {
+      const message =
+        error.response?.data?.detail || "Um erro desconhecido ocorreu";
+      dispatch(loginFailure(message));
+      throw error;
+    }
+  };
 
 export const logout = () => (dispatch) => {
   dispatch(logoutSuccess());
@@ -114,5 +115,8 @@ export const refreshAccessToken = () => async (dispatch, getState) => {
 };
 
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
+export const selectUser = (state) => state.auth.user;
+export const selectAccessToken = (state) => state.auth.accessToken;
+export const selectRefreshToken = (state) => state.auth.refreshToken;
 
 export default authSlice.reducer;

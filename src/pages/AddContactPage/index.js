@@ -1,33 +1,36 @@
-// AddContactForm.js
 import React, { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addNewContact } from "../../features/slices/contactsSlice";
-import FormContainer, { ErrorMessage } from "./styles"; // Importa o estilo do componente
-import { useNavigate } from "react-router-dom"; // Importa useHistory para redirecionar o usuário
-import InputMask from 'react-input-mask'; // Importa o componente InputMask
+import { selectUser, selectAccessToken } from "../../features/slices/authSlice"; // Importe os seletores necessários
+import FormContainer, { ErrorMessage } from "./styles";
+import { useNavigate } from "react-router-dom";
+import InputMask from "react-input-mask";
 
-// Função para capitalizar o nome e o sobrenome e remover espaços em branco extras
 const capitalizeName = (fullName) => {
-  // Remove espaços em branco extras e divide o nome completo em partes (nome e sobrenome) usando um espaço como separador
   const parts = fullName.trim().split(" ");
-  // Mapeia cada parte e capitaliza a primeira letra de cada uma
-  const capitalizedParts = parts.map(part => part.charAt(0).toUpperCase() + part.slice(1));
-  // Junta as partes capitalizadas novamente em um único nome e retorna
+  const capitalizedParts = parts.map(
+    (part) => part.charAt(0).toUpperCase() + part.slice(1)
+  );
   return capitalizedParts.join(" ");
 };
 
 const AddContactForm = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Instancia useHistory
+  const navigate = useNavigate();
+  const user = useSelector(selectUser);
+  const userId = user.user_id; // Acessa o user_id do objeto user
+  const accessToken = useSelector(selectAccessToken); // Obtém o token de acesso do estado global
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    telefone: "",
+    phone: "",
+    user: userId ? userId : null,
   });
   const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
-  const [telefoneError, setTelefoneError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar o envio do formulário
+  const [telefoneError, setTelefoneError] = useState(""); // Corrigido para "telefoneError"
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -40,6 +43,7 @@ const AddContactForm = () => {
   const validateName = (value) => {
     if (!value.trim()) {
       setNameError("Name is required");
+     
     } else if (!/^[A-Za-z]{3,}/.test(value)) {
       setNameError(
         "Name must start with a letter and have at least three letters"
@@ -61,9 +65,9 @@ const AddContactForm = () => {
 
   const validateTelefone = (value) => {
     if (!value.trim()) {
-      setTelefoneError("Telefone is required");
+      setTelefoneError("Phone is required"); // Corrigido para "Phone is required"
     } else if (!/^\(\d{2}\)\d{5}-\d{4}$/.test(value)) {
-      setTelefoneError("Invalid telefone format");
+      setTelefoneError("Invalid phone format"); // Corrigido para "Invalid phone format"
     } else {
       setTelefoneError("");
     }
@@ -71,35 +75,46 @@ const AddContactForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setIsSubmitting(true); // Define que o formulário está sendo enviado
+    setIsSubmitting(true);
+
     validateName(formData.name);
     validateEmail(formData.email);
-    validateTelefone(formData.telefone);
+    validateTelefone(formData.phone); // Corrigido para "phone"
+
     if (!nameError && !emailError && !telefoneError) {
-      // Capitaliza o nome antes de salvar os dados do contato
       const capitalizedFormData = {
         ...formData,
-        name: capitalizeName(formData.name)
+        name: capitalizeName(formData.name),
+        user: userId,
       };
-      dispatch(addNewContact(capitalizedFormData));
+
+      // Adiciona o token de acesso como parte dos dados do novo contato
+      const contactDataWithToken = {
+        ...capitalizedFormData,
+        token: accessToken,
+      };
+
+      dispatch(addNewContact(contactDataWithToken));
       setFormData({
         name: "",
         email: "",
-        telefone: "",
+        phone: "",
+        user: userId,
       });
-      // Redireciona para a página inicial após um curto intervalo de tempo (3 segundos)
+
       setTimeout(() => {
         navigate("/");
       }, 3000);
+    } else {
+      setIsSubmitting(false);
     }
   };
 
   useEffect(() => {
-    // Limpar erros quando o formulário for enviado
     if (isSubmitting && !nameError && !emailError && !telefoneError) {
       setNameError("");
       setEmailError("");
-      setTelefoneError("");
+      setTelefoneError(""); // Corrigido para "telefoneError"
     }
   }, [isSubmitting, nameError, emailError, telefoneError]);
 
@@ -123,7 +138,7 @@ const AddContactForm = () => {
               validateName(e.target.value);
             }}
             required
-            disabled={isSubmitting} // Desabilita o campo se o formulário estiver sendo enviado
+            disabled={isSubmitting}
           />
           <ErrorMessage>{nameError}</ErrorMessage>
         </div>
@@ -139,32 +154,35 @@ const AddContactForm = () => {
               validateEmail(e.target.value);
             }}
             required
-            disabled={isSubmitting} // Desabilita o campo se o formulário estiver sendo enviado
+            disabled={isSubmitting}
           />
-           <ErrorMessage>{emailError}</ErrorMessage>
+          <ErrorMessage>{emailError}</ErrorMessage>
         </div>
         <div>
-          <label htmlFor="telefone">Phone:</label>
+          <label htmlFor="phone">Phone:</label> {/* Corrigido para "phone" */}
           <InputMask
             mask="(99)99999-9999"
             type="text"
-            id="telefone"
-            name="telefone"
-            value={formData.telefone}
+            id="phone"
+            name="phone"
+            value={formData.phone}
             onChange={(e) => {
               handleChange(e);
               validateTelefone(e.target.value);
             }}
             required
-            disabled={isSubmitting} // Desabilita o campo se o formulário estiver sendo enviado
+            disabled={isSubmitting}
           />
-          <ErrorMessage>{telefoneError}</ErrorMessage>
+          <ErrorMessage>{telefoneError}</ErrorMessage>{" "}
+          {/* Corrigido para "telefoneError" */}
         </div>
         <button type="submit" disabled={isSubmitting}>
           Add Contact
         </button>
       </form>
-      <button className="cancel" onClick={handleCancel}>Cancel</button>
+      <button className="cancel" onClick={handleCancel}>
+        Cancel
+      </button>
     </FormContainer>
   );
 };

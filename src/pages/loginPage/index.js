@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import Alert from "@mui/material/Alert";
-import Stack from "@mui/material/Stack";
 import { login } from "../../features/slices/authSlice";
 import {
   LoginContainer,
   Title,
   ErrorMessage,
+  SuccessMessage,
   Form,
   Label,
   Input,
@@ -16,6 +15,7 @@ import {
   Button,
   RegisterLink,
   LinkText,
+  Error,
 } from "./styles";
 
 const Login = () => {
@@ -28,8 +28,11 @@ const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const handleInputUsername = (e) => setUsername(e.target.value);
-  const handleInputPassword = (e) => setPassword(e.target.value);
+  const handleInputChange = (setter) => (e) => {
+    setter(e.target.value);
+    if (errMsg) setErrMsg(""); // Limpa a mensagem de erro quando o usuário começa a digitar
+  };
+
   const togglePasswordVisibility = () => setCheck((prevState) => !prevState);
 
   const handleLogin = async (e) => {
@@ -47,14 +50,14 @@ const Login = () => {
       }, 3000);
     } catch (error) {
       console.error("Error during login:", error);
-      if (!error.originalStatus) {
-        setErrMsg(error.response?.data?.detail);
-      } else if (error.originalStatus === 400) {
-        setErrMsg(error.response?.data?.detail);
-      } else if (error.originalStatus === 401) {
-        setErrMsg(error.response?.data?.detail);
+      if (error.message === "Network Error") {
+        setErrMsg("Network Error: Unable to reach the server.");
+      } else if (error.response?.status === 400) {
+        setErrMsg("Invalid credentials. Please try again.");
+      } else if (error.response?.status === 401) {
+        setErrMsg("Unauthorized. Check your username and password.");
       } else {
-        setErrMsg("Login Failed.");
+        setErrMsg("Login Failed. Please try again later.");
       }
     } finally {
       setIsSubmitting(false);
@@ -64,25 +67,13 @@ const Login = () => {
   return (
     <LoginContainer>
       <Title>Login</Title>
-      <ErrorMessage>
-        {errMsg && (
-          <Stack sx={{ width: "100%" }} spacing={2}>
-            <Alert severity="error">{errMsg}</Alert>
-          </Stack>
-        )}
-      </ErrorMessage>
-      {successMsg && (
-        <Stack sx={{ width: "100%" }} spacing={2}>
-          <Alert severity="success">{successMsg}</Alert>
-        </Stack>
-      )}
       <Form onSubmit={handleLogin}>
         <Label>Username:</Label>
         <Input
           type="text"
           name="username"
           value={username}
-          onChange={handleInputUsername}
+          onChange={handleInputChange(setUsername)}
           required
           disabled={isSubmitting || successMsg}
         />
@@ -91,7 +82,7 @@ const Login = () => {
           type={check ? "text" : "password"}
           name="password"
           value={password}
-          onChange={handleInputPassword}
+          onChange={handleInputChange(setPassword)}
           required
           disabled={isSubmitting || successMsg}
         />
@@ -104,13 +95,16 @@ const Login = () => {
           />
           <CheckboxLabel>Show password</CheckboxLabel>
         </CheckboxContainer>
+        <Error>
+          {errMsg && <ErrorMessage>{errMsg}</ErrorMessage>}
+          {successMsg && <SuccessMessage>{successMsg}</SuccessMessage>}
+        </Error>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? "Logging in..." : "Login"}
         </Button>
       </Form>
       <RegisterLink>
-        Don't have an account?
-        <LinkText to="/register">Register</LinkText>
+        Don't have an account? <LinkText to="/register">Register</LinkText>
       </RegisterLink>
     </LoginContainer>
   );

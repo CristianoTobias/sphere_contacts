@@ -79,7 +79,7 @@ const PersonalContact = () => {
             <ContactName>{filteredContact.name}</ContactName>
             <Email>Email: {filteredContact.email}</Email>
             <Phone>
-              Phone: <span> {filteredContact.telefone}</span>
+              Phone: <span> {filteredContact.phone}</span>
             </Phone>
           </ContactInfo>
           <ButtonContainer>
