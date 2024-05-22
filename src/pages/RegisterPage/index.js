@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import React, { useState, useEffect } from "react"; // Importa React e hooks useState e useEffect
+import { useNavigate } from "react-router-dom"; // Importa o hook useNavigate do react-router-dom para navegação
+import axios from "axios"; // Importa axios para fazer requisições HTTP
 import {
   RegisterContainer,
   Title,
-  ErrorMessage,
-  SuccessMessage,
+  Message,
   Form,
   Label,
   Input,
@@ -14,11 +13,11 @@ import {
   Button,
   LoginLink,
   LinkText,
-  Error,
-} from "./styles";
+} from "./styles"; // Importa componentes estilizados do arquivo de estilos
 
+// Função para verificar a similaridade entre duas strings
 function checkSimilarity(str1, str2) {
-  const similarityThreshold = 0.3; // Defina um limiar de similaridade adequado
+  const similarityThreshold = 0.3; // Define um limiar de similaridade
   const minLength = Math.min(str1.length, str2.length);
   const maxLength = Math.max(str1.length, str2.length);
   let matchingChars = 0;
@@ -34,72 +33,90 @@ function checkSimilarity(str1, str2) {
 }
 
 const Register = () => {
-  const navigate = useNavigate();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [errMsg, setErrMsg] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
-  const [check, setCheck] = useState(false);
-  const [inputChanged, setInputChanged] = useState(false); // Estado para controlar se houve alteração nos inputs
+  const navigate = useNavigate(); // Hook para navegação
+  const [username, setUsername] = useState(""); // Estado para armazenar o nome de usuário
+  const [password, setPassword] = useState(""); // Estado para armazenar a senha
+  const [confirmPassword, setConfirmPassword] = useState(""); // Estado para armazenar a confirmação da senha
+  const [message, setMessage] = useState({ text: "", type: "" }); // Estado para armazenar mensagens de erro ou sucesso
+  const [check, setCheck] = useState(false); // Estado para controlar a visibilidade da senha
 
+  // Funções para atualizar os estados dos campos de entrada
   const handleInputUsername = (e) => {
     setUsername(e.target.value);
-    setErrMsg(""); // Limpar mensagens de erro ao digitar
-    setInputChanged(true); // Indicar que houve uma alteração no input
+    setMessage({ text: "", type: "" });
   };
 
   const handleInputPassword = (e) => {
     setPassword(e.target.value);
-    setErrMsg("");
-    setInputChanged(true);
+    setMessage({ text: "", type: "" });
   };
 
-  const handleInputconfirmPassword = (e) => {
+  const handleInputConfirmPassword = (e) => {
     setConfirmPassword(e.target.value);
-    setErrMsg("");
-    setInputChanged(true);
+    setMessage({ text: "", type: "" });
   };
 
   const togglePasswordVisibility = () => {
     setCheck((prevState) => !prevState);
   };
 
+  // Função para verificar sequências repetidas na senha
+  function hasRepeatedSequences(str) {
+    const repeatingSequences = /(.)\1{2,}/g;
+    return repeatingSequences.test(str);
+  }
+
+  // Efeito para redirecionar após o registro bem-sucedido
   useEffect(() => {
     let timer;
-    if (successMsg) {
+    if (message.type === "success") {
       timer = setTimeout(() => {
-        setSuccessMsg("");
+        setMessage({ text: "", type: "" });
         navigate("/login");
       }, 5000);
     }
     return () => clearTimeout(timer);
-  }, [successMsg, navigate]);
+  }, [message, navigate]);
 
-  const apiUrl = process.env.REACT_APP_API_URL;
+  const apiUrl = process.env.REACT_APP_API_URL; // URL da API
 
+  // Função para tratar o envio do formulário de registro
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrMsg("");
-    setSuccessMsg("");
-
-    // Remover espaços em branco antes e depois do nome de usuário
     const trimmedUsername = username.trim();
     setUsername(trimmedUsername);
+    const hasLetters = /[a-zA-Z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChars = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const hasRepeated = hasRepeatedSequences(password);
 
+    // Verificações de validação da senha
+    if (!hasLetters || !hasNumbers || !hasSpecialChars || hasRepeated) {
+      setMessage({
+        text: "Password must contain letters, numbers, and at least one special character, and should not have repeating sequences!",
+        type: "error",
+      });
+      return;
+    }
     if (password !== confirmPassword) {
-      setErrMsg("Passwords do not match!");
+      setMessage({ text: "Passwords do not match!", type: "error" });
       return;
     }
 
     if (password.length < 8) {
-      setErrMsg("Password must be at least 8 characters long!");
+      setMessage({
+        text: "Password must be at least 8 characters long!",
+        type: "error",
+      });
       return;
     }
 
     const specialChars = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/;
     if (!specialChars.test(password)) {
-      setErrMsg("Password must contain at least one special character!");
+      setMessage({
+        text: "Password must contain at least one special character!",
+        type: "error",
+      });
       return;
     }
 
@@ -109,44 +126,50 @@ const Register = () => {
         part.length > 0 &&
         password.toLowerCase().includes(part.toLowerCase())
       ) {
-        setErrMsg("Password cannot contain parts of your username!");
+        setMessage({
+          text: "Password cannot contain parts of your username!",
+          type: "error",
+        });
         return;
       }
     }
 
-    if (/^\d+$/.test(password)) {
-      setErrMsg("Password cannot be entirely numeric!");
-      return;
-    }
-
     if (password.toLowerCase().includes(trimmedUsername.toLowerCase())) {
-      setErrMsg("Password cannot contain your username!");
+      setMessage({
+        text: "Password cannot contain your username!",
+        type: "error",
+      });
       return;
     }
 
     const usernameRegex = /^[a-zA-Z0-9@/./+/-/_]{1,150}$/;
     if (!usernameRegex.test(trimmedUsername)) {
-      setErrMsg("Invalid username format!");
+      setMessage({ text: "Invalid username format!", type: "error" });
       return;
     }
 
     if (checkSimilarity(password, trimmedUsername)) {
-      setErrMsg("Password is too similar to your username!");
+      setMessage({
+        text: "Password is too similar to your username!",
+        type: "error",
+      });
       return;
     }
 
     try {
-      const response = await axios.post(`${apiUrl}/useregist/`, {
+      // Envio dos dados para a API
+      await axios.post(`${apiUrl}/useregist/`, {
         username: trimmedUsername,
         password: password,
       });
 
-      if (response.status === 201) {
-        setUsername("");
-        setPassword("");
-        setConfirmPassword("");
-        setSuccessMsg("Successfully registered, please log in!");
-      }
+      setMessage({
+        text: "Successfully registered, please log in!",
+        type: "success",
+      });
+      setUsername("");
+      setPassword("");
+      setConfirmPassword("");
     } catch (error) {
       console.error("Error during registration:", error);
       if (
@@ -155,17 +178,30 @@ const Register = () => {
           "UNIQUE constraint failed: auth_user.username"
         )
       ) {
-        setErrMsg(
-          "Username already exists. Please choose a different username."
-        );
+        setMessage({
+          text: "Username already exists. Please choose a different username.",
+          type: "error",
+        });
       } else if (error.message === "Network Error") {
-        setErrMsg("Network Error: Unable to reach the server.");
+        setMessage({
+          text: "Network Error: Unable to reach the server.",
+          type: "error",
+        });
       } else if (error.response?.status === 400) {
-        setErrMsg("Invalid credentials. Please try again.");
+        setMessage({
+          text: "Invalid credentials. Please try again.",
+          type: "error",
+        });
       } else if (error.response?.status === 401) {
-        setErrMsg("Unauthorized.");
+        setMessage({
+          text: "Unauthorized.",
+          type: "error",
+        });
       } else {
-        setErrMsg("Registration Failed.");
+        setMessage({
+          text: "Registration Failed.",
+          type: "error",
+        });
       }
     }
   };
@@ -181,7 +217,7 @@ const Register = () => {
           onChange={handleInputUsername}
           value={username}
           required
-          disabled={successMsg !== ""}
+          disabled={message.type === "success"}
         />
         <Label>Password:</Label>
         <Input
@@ -190,34 +226,29 @@ const Register = () => {
           onChange={handleInputPassword}
           value={password}
           required
-          disabled={successMsg !== ""}
+          disabled={message.type === "success"}
         />
         <Label>Confirm Password:</Label>
         <Input
           type={check ? "text" : "password"}
           name="confirm-password"
-          onChange={handleInputconfirmPassword}
+          onChange={handleInputConfirmPassword}
           value={confirmPassword}
           required
-          disabled={successMsg !== ""}
+          disabled={message.type === "success"}
         />
         <CheckboxContainer>
           <input
             type="checkbox"
             checked={check}
             onChange={togglePasswordVisibility}
-            disabled={successMsg !== ""}
+            disabled={message.type === "success"}
           />
           <CheckboxLabel>Show password</CheckboxLabel>
         </CheckboxContainer>
-        <Error>
-          {errMsg && <ErrorMessage>{errMsg}</ErrorMessage>}
-          {inputChanged && successMsg && (
-            <SuccessMessage>{successMsg}</SuccessMessage>
-          )}
-        </Error>
-        <Button type="submit" disabled={successMsg !== ""}>
-          {successMsg ? "Registered!" : "Register"}
+        <Message type={message.type}>{message.text}</Message>
+        <Button type="submit" disabled={message.type === "success"}>
+          {message.type === "success" ? "Registered!" : "Register"}
         </Button>
       </Form>
       <LoginLink>

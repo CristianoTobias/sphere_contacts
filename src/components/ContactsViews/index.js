@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Input,
   ContactsContainer,
@@ -12,9 +12,12 @@ import {
 
 const ContactsViews = ({ contacts, handleContactClick }) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedLetter, setSelectedLetter] = useState("");
+  const contactsRef = useRef(null);
 
   const handleSearch = (term) => {
     setSearchTerm(term);
+    setSelectedLetter("");
     handleContactClick("");
   };
 
@@ -29,37 +32,54 @@ const ContactsViews = ({ contacts, handleContactClick }) => {
   const alphabetArray = Array.from(alphabetSet).sort();
 
   const scrollToLetter = (letter) => {
-    const letterElement = document.getElementById(letter);
-    if (letterElement) {
-      letterElement.scrollIntoView({ behavior: "smooth" });
+    const contactsContainer = contactsRef.current;
+    if (contactsContainer) {
+      const containerTop = contactsContainer.getBoundingClientRect().top + window.pageYOffset;
+      const letterElement = document.getElementById(letter);
+      if (letterElement) {
+        const letterTop = letterElement.getBoundingClientRect().top + window.pageYOffset - containerTop;
+        const containerScrollTop = contactsContainer.scrollTop;
+        const finalScrollTop = containerScrollTop + letterTop;
+        contactsContainer.scrollTop = finalScrollTop;
+      }
     }
   };
-
-  const handleLetterClick = () => {
+  
+  const handleLetterClick = (letter) => {
+    setSelectedLetter(letter);
     setSearchTerm("");
     handleContactClick("");
+    scrollToLetter(letter);
   };
 
+  const filteredByLetter = contacts.filter(
+    (contact) =>
+      contact.name.charAt(0).toUpperCase() === selectedLetter.toUpperCase()
+  );
+
   return (
-    <>
+    <ContactsContainer className="contacts-container">
       <Input
         type="text"
         placeholder="Search..."
         value={searchTerm}
         onChange={(e) => handleSearch(e.target.value)}
       />
-      <ContactsContainer className="contacts-container">
-        {filteredContacts.length === 0 ? (
-          <NoContacts>No contacts registered.</NoContacts>
-        ) : (
-          <ContactItemContainer>
+      {searchTerm && filteredContacts.length === 0 && (
+        <NoContacts>No contacts found.</NoContacts>
+      )}
+      {selectedLetter && filteredByLetter.length === 0 && (
+        <NoContacts>No contacts found.</NoContacts>
+      )}
+      {(!searchTerm || filteredContacts.length > 0) &&
+        (!selectedLetter || filteredByLetter.length > 0) && (
+          <ContactItemContainer ref={contactsRef}>
             {alphabetArray.map((letter) => (
               <div key={letter} id={letter}>
                 <LetterHeader>{letter}</LetterHeader>
                 {filteredContacts
                   .filter(
-                    (contact) =>
-                      contact.name.charAt(0).toUpperCase() === letter
+                    (contact) => contact.name.charAt(0).toUpperCase() === letter
                   )
                   .sort((a, b) => a.name.localeCompare(b.name))
                   .map((contact) => (
@@ -76,24 +96,20 @@ const ContactsViews = ({ contacts, handleContactClick }) => {
             ))}
           </ContactItemContainer>
         )}
-        <AlphabetBar>
-          {Array.from({ length: 26 }, (_, index) => {
-            const letter = String.fromCharCode(65 + index);
-            return (
-              <AlphabetLetter
-                key={letter}
-                onClick={() => {
-                  handleLetterClick();
-                  scrollToLetter(letter);
-                }}
-              >
-                {letter}
-              </AlphabetLetter>
-            );
-          })}
-        </AlphabetBar>
-      </ContactsContainer>
-    </>
+      <AlphabetBar>
+        {Array.from({ length: 26 }, (_, index) => {
+          const letter = String.fromCharCode(65 + index);
+          return (
+            <AlphabetLetter
+              key={letter}
+              onClick={() => handleLetterClick(letter)}
+            >
+              {letter}
+            </AlphabetLetter>
+          );
+        })}
+      </AlphabetBar>
+    </ContactsContainer>
   );
 };
 

@@ -1,5 +1,4 @@
-// Em PersonalContact.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -7,6 +6,7 @@ import {
   selectContactsFilter,
   removeContact,
 } from "../../features/slices/contactsSlice";
+import { logout } from "../../features/slices/authSlice"; // Import logout action
 import {
   PersonalContactContainer,
   ContactHeader,
@@ -19,20 +19,35 @@ import {
   Button,
   Message,
   ButtonDelete,
+  MessageError,
 } from "./styles";
 
 const PersonalContact = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const id = useSelector(selectContactsFilter);
-  const filteredContact = useSelector((state) => {
-    return selectFilteredContactById(state, id);
-  });
+  const filteredContact = useSelector((state) =>
+    selectFilteredContactById(state, id)
+  );
 
   const [circleColors, setCircleColors] = useState({});
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleDeleteContact = (contactId) => {
-    dispatch(removeContact(contactId));
+  const handleDeleteContact = async (contactId) => {
+    try {
+      await dispatch(removeContact(contactId)).unwrap();
+      setErrorMessage("");
+    } catch (error) {
+      if (error.errorMessage === "Network Error") {
+        setErrorMessage("Network Error: Unable to reach the server.");
+      } else if (error.status === 400) {
+        setErrorMessage("Bad request.");
+      } else if (error.status === 401) {
+        setErrorMessage("Unauthorized. Check your authentication token.");
+      } else {
+        setErrorMessage("Failed to delete contact. Please try again later.");
+      }
+    }
   };
 
   const handleEditContact = (contactId) => {
@@ -79,14 +94,16 @@ const PersonalContact = () => {
             <ContactName>{filteredContact.name}</ContactName>
             <Email>Email: {filteredContact.email}</Email>
             <Phone>
-              Phone: <span> {filteredContact.phone}</span>
+              Phone: <span>{filteredContact.phone}</span>
             </Phone>
           </ContactInfo>
           <ButtonContainer>
             <Button onClick={() => handleEditContact(filteredContact.id)}>
               Edit
             </Button>
-            <ButtonDelete onClick={() => handleDeleteContact(filteredContact.id)}>
+            <ButtonDelete
+              onClick={() => handleDeleteContact(filteredContact.id)}
+            >
               Delete
             </ButtonDelete>
           </ButtonContainer>
@@ -94,6 +111,7 @@ const PersonalContact = () => {
       ) : (
         <Message>No contact selected.</Message>
       )}
+      {errorMessage && <MessageError>{errorMessage}</MessageError>}
     </PersonalContactContainer>
   );
 };

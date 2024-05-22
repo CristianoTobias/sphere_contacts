@@ -13,10 +13,21 @@ export const NavContainer = styled.nav`
   justify-content: space-between; /* Espaço uniforme entre os itens */
   align-items: center; /* Alinhar os itens verticalmente */
   z-index: 2;
+
+  @media only screen and (max-width: 768px) {
+    /* Estilos específicos para dispositivos móveis */
+    display: block;
+  }
 `;
 
 export const Logo = styled.h1`
   font-size: 25px;
+  @media only screen and (max-width: 768px) {
+    /* Estilos específicos para dispositivos móveis */
+    font-size: 30px;
+    text-align: center;
+    margin-bottom: 0;
+  }
 `;
 
 export const UserInfo = styled.div`
@@ -37,6 +48,11 @@ export const Button = styled.button`
   cursor: pointer; /* Altera o cursor para indicar que é clicável */
   transition: background-color 0.3s; /* Transição suave de cor de fundo */
   width: 100px; /* Largura fixa para os botões */
+  @media only screen and (max-width: 768px) {
+    /* Estilos específicos para dispositivos móveis */
+    background-color: red;
+    width: 80px;
+  }
 `;
 
 export const UserName = styled.p`
@@ -48,12 +64,12 @@ export const LogoutButton = styled(Button)`
   border-radius: 3px;
 
   &:hover {
-    background-color: #A9A9A9; /* Cor de fundo do botão ao passar o mouse */
+    background-color: #a9a9a9; /* Cor de fundo do botão ao passar o mouse */
   }
 `;
 
 export const AuthButton = styled(Button)`
-  background-color: #228B22; /* Cor de fundo do botão de autenticação */
+  background-color: #228b22; /* Cor de fundo do botão de autenticação */
 
   &:hover {
     background-color: #006400; /* Cor de fundo do botão ao passar o mouse */

@@ -1,14 +1,24 @@
-// styles.js
-
 import styled from "styled-components";
 
 export const ContactsContainer = styled.div`
   margin-top: 0px;
-  position: fixed;
-  width: 400px;
+  position: relative;
   display: flex;
-  height: 100vh;
+  flex-direction: column;
   background-color: #f0f0f0;
+   
+  @media only screen and (max-width: 1024px) {
+    width: 100%;
+    height: auto; /* Ajuste a altura automaticamente */
+    position: relative; /* Alterar para relativo em dispositivos móveis */
+  }
+
+  @media only screen and (max-width: 768px) {
+    /* Estilos específicos para dispositivos móveis */
+    width: 100%;
+    height: auto; /* Ajuste a altura automaticamente */
+    position: relative; /* Alterar para relativo em dispositivos móveis */
+  }
 `;
 
 export const ContactItemContainer = styled.div`
@@ -18,25 +28,38 @@ export const ContactItemContainer = styled.div`
   background-color: #f0f0f0;
   border-bottom: none;
   max-height: calc(100vh - 170px);
-  width: 100%;
   position: relative;
-  height: 100%; /* Ocupa 100% da altura do container pai */
-  overflow-y: hidden;
 
   &:hover {
     overflow-y: auto; /* Exibe a barra de rolagem vertical durante o hover */
     transition: overflow-y 0.3s; /* Adiciona transição para suavizar o efeito de aparecimento da barra de rolagem */
   }
+
+  @media only screen and (max-width: 1024px) {
+    max-width: 90%;
+    width: 100%;
+  }
+
+  @media only screen and (max-width: 768px) {
+    /* Estilos específicos para dispositivos móveis */
+    max-width: 100%;
+    width: 100%;
+  }
 `;
 
 export const Input = styled.input`
-  position: sticky;
-  top: 0;
-  left: 0;
-  margin-bottom: 10px;
   padding: 5px;
-  width: 350px;
+  width: 70%;
+  height: 30px;
   z-index: 3;
+
+  @media only screen and (max-width: 1024px) {
+    
+  }
+
+  @media only screen and (max-width: 768px) {
+    
+  }
 `;
 
 export const LetterHeader = styled.h2`
@@ -45,17 +68,19 @@ export const LetterHeader = styled.h2`
   top: 0;
   z-index: 1;
   font-size: 14px;
-  color: #333333;
+  color: #cecece;
   border-bottom: 1px solid #333333;
   margin-top: 30px;
 `;
 
 export const AlphabetBar = styled.div`
+  position: absolute;
+  right: -20px;
+  top: 0;
   display: flex;
   width: 20px;
   flex-direction: column;
-  margin-left: 20px;
-  margin-top: -30px;
+  align-items: center;
 `;
 
 export const AlphabetLetter = styled.div`
@@ -63,6 +88,7 @@ export const AlphabetLetter = styled.div`
   font-size: 13px;
   color: #00008b;
   font-weight: bolder;
+
   &:hover {
     background-color: #00008b;
     color: #fff;

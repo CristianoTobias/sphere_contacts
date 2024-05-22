@@ -5,12 +5,17 @@ export const PersonalContactContainer = styled.div`
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  padding-left: 160px;
+  display: flex;
+  position: relative;
+  @media only screen and (max-width: 768px) {
+    /* Estilos específicos para dispositivos móveis */
+    max-width: 768px;
+    
+  }
 `;
 
 export const ContactHeader = styled.div`
   display: flex;
-  padding-left: 70px;
   margin-bottom: 20px;
 `;
 
@@ -29,7 +34,7 @@ export const InitialsCircle = styled.div`
 `;
 
 export const ContactName = styled.h2`
-  font-size: 24px;
+  font-size: 1.5em;
   color: #333;
 `;
 
@@ -49,7 +54,7 @@ export const Phone = styled.p`
   color: #333;
   font-weight: bold;
   span {
-    font-size: 20px;
+    font-size: 18px;
   }
 `;
 
@@ -88,3 +93,11 @@ export const Message = styled.p`
   color: #555555;
   margin-top: 150x;
 `;
+
+export const MessageError = styled.p`
+position: absolute;
+bottom: 60px;
+left: 20px;
+color: red;
+
+`

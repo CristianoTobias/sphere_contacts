@@ -1,11 +1,11 @@
-import ButtonAdd from './styles'; // Supondo que o arquivo esteja no mesmo diretório
-import { useNavigate } from 'react-router-dom'; // Importe o useNavigate
+import ButtonAdd from './styles';
+import { useNavigate } from 'react-router-dom';
 
 const ButtonAddContact = () => {
-    const navigate = useNavigate(); // Use o hook useNavigate
+    const navigate = useNavigate();
 
     const handleClick = () => {
-        navigate('/contacts/add-contact'); // Substitua 'sua-rota' pela rota que você deseja direcionar
+        navigate('/contacts/add-contact'); 
     };
 
     return (

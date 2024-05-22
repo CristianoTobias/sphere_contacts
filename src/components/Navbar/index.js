@@ -23,7 +23,9 @@ const NavBar = () => {
 
   useEffect(() => {
     // Verifica se o usuário está na página de login ou de registro
-    setShowButtons(location.pathname !== "/login" && location.pathname !== "/register");
+    setShowButtons(
+      location.pathname !== "/login" && location.pathname !== "/register"
+    );
   }, [location.pathname]); // Atualiza quando a localização da página mudar
 
   const handleLoginClick = () => {
@@ -40,7 +42,10 @@ const NavBar = () => {
 
   return (
     <NavContainer>
-      <Logo> My Contacts</Logo>
+      <div>
+        <Logo> My Contacts</Logo>
+      </div>
+
       <UserInfo>
         {isAuthenticated ? (
           <>
