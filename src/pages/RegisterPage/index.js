@@ -171,7 +171,7 @@ const Register = () => {
       setPassword("");
       setConfirmPassword("");
     } catch (error) {
-      console.error("Error during registration:", error);
+        console.error("Error during registration:", error);
       if (
         error.response?.status === 500 &&
         error.response?.data?.includes(
