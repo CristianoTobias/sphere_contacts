@@ -34,17 +34,21 @@ const ContactsViews = ({ contacts, handleContactClick }) => {
   const scrollToLetter = (letter) => {
     const contactsContainer = contactsRef.current;
     if (contactsContainer) {
-      const containerTop = contactsContainer.getBoundingClientRect().top + window.pageYOffset;
+      const containerTop =
+        contactsContainer.getBoundingClientRect().top + window.pageYOffset;
       const letterElement = document.getElementById(letter);
       if (letterElement) {
-        const letterTop = letterElement.getBoundingClientRect().top + window.pageYOffset - containerTop;
+        const letterTop =
+          letterElement.getBoundingClientRect().top +
+          window.pageYOffset -
+          containerTop;
         const containerScrollTop = contactsContainer.scrollTop;
         const finalScrollTop = containerScrollTop + letterTop;
         contactsContainer.scrollTop = finalScrollTop;
       }
     }
   };
-  
+
   const handleLetterClick = (letter) => {
     setSelectedLetter(letter);
     setSearchTerm("");
@@ -65,12 +69,12 @@ const ContactsViews = ({ contacts, handleContactClick }) => {
         value={searchTerm}
         onChange={(e) => handleSearch(e.target.value)}
       />
-      {searchTerm && filteredContacts.length === 0 && (
+
+      {(searchTerm || filteredContacts.length === 0) && (
         <NoContacts>No contacts found.</NoContacts>
       )}
-      {selectedLetter && filteredByLetter.length === 0 && (
-        <NoContacts>No contacts found.</NoContacts>
-      )}
+      {selectedLetter && <NoContacts>No contacts found.</NoContacts>}
+
       {(!searchTerm || filteredContacts.length > 0) &&
         (!selectedLetter || filteredByLetter.length > 0) && (
           <ContactItemContainer ref={contactsRef}>
