@@ -97,7 +97,7 @@ export const removeContact = createAsyncThunk(
 export const updateContact = createAsyncThunk(
   "contacts/updateContact", // Nome da ação
   async (updatedContact, { rejectWithValue }) => {
-    // Payload com os dados atualizados do contato e objetos adicionais (opcional)
+    // Payload com os dados atualizados do contato
     try {
       const response = await axiosInstance.put(
         `/contacts/${updatedContact.id}/`,

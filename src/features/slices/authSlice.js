@@ -78,6 +78,7 @@ const authSlice = createSlice({
       cookies.set("accessToken", action.payload.accessToken, { expires: 60 * 60 * 24 }); // Atualiza o token de acesso no cookie
     }
   },
+  
 });
 
 // Exporta as actions do slice de autenticação
@@ -107,7 +108,7 @@ export const logout = () => (dispatch) => {
 
 // Seletor para obter o estado de autenticação
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
-// Seletor para obter as informações do usuário
+// Seletor para obter o estado de ediçao
 export const selectUser = (state) => state.auth.user;
 // Seletor para obter o token de acesso
 export const selectAccessToken = (state) => state.auth.accessToken;

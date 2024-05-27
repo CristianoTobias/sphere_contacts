@@ -3,7 +3,6 @@ import { createRoot } from "react-dom/client"; // Importa a função createRoot 
 import { Provider } from "react-redux"; // Componente Provider usado para disponibilizar o store Redux para todos os componentes
 import { store } from "./app/store"; // Importa a store Redux da aplicação
 import App from "./App"; // Importa o componente principal da aplicação
-import "./index.css"; // Importa o arquivo de estilos CSS principal
 
 const container = document.getElementById("root"); // Seleciona o elemento HTML com o id "root" onde a aplicação será renderizada
 const root = createRoot(container); // Cria uma raiz de renderização na DOM usando o elemento selecionado

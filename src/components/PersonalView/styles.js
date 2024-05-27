@@ -26,7 +26,7 @@ export const InitialsCircle = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 20px;
+  font-size: 28px;
   font-weight: bold;
   color: #ffffff;
   background-color: ${({ color }) => color};

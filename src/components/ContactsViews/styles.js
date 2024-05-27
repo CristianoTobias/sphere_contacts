@@ -6,7 +6,7 @@ export const ContactsContainer = styled.div`
   display: flex;
   flex-direction: column;
   background-color: #f0f0f0;
-   
+  
   @media only screen and (max-width: 1024px) {
     width: 100%;
     height: auto; /* Ajuste a altura automaticamente */
@@ -29,7 +29,7 @@ export const ContactItemContainer = styled.div`
   border-bottom: none;
   max-height: calc(100vh - 170px);
   position: relative;
-
+  padding-bottom: 300px;
   &:hover {
     overflow-y: auto; /* Exibe a barra de rolagem vertical durante o hover */
     transition: overflow-y 0.3s; /* Adiciona transição para suavizar o efeito de aparecimento da barra de rolagem */

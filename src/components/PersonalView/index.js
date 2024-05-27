@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
   selectFilteredContactById,
   selectContactsFilter,
   removeContact,
+  fetchContacts,
 } from "../../features/slices/contactsSlice";
-import { logout } from "../../features/slices/authSlice"; // Import logout action
 import {
   PersonalContactContainer,
   ContactHeader,
@@ -26,9 +26,7 @@ const PersonalContact = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const id = useSelector(selectContactsFilter);
-  const filteredContact = useSelector((state) =>
-    selectFilteredContactById(state, id)
-  );
+  const filteredContact = useSelector((state) => selectFilteredContactById(state, id));
 
   const [circleColors, setCircleColors] = useState({});
   const [errorMessage, setErrorMessage] = useState("");
@@ -37,8 +35,9 @@ const PersonalContact = () => {
     try {
       await dispatch(removeContact(contactId)).unwrap();
       setErrorMessage("");
+      dispatch(fetchContacts());
     } catch (error) {
-      if (error.errorMessage === "Network Error") {
+      if (error.message === "Network Error") {
         setErrorMessage("Network Error: Unable to reach the server.");
       } else if (error.status === 400) {
         setErrorMessage("Bad request.");
@@ -63,10 +62,10 @@ const PersonalContact = () => {
     return initials.toUpperCase();
   };
 
-  function getRandomColor() {
+  const getRandomColor = () => {
     const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"];
     return colors[Math.floor(Math.random() * colors.length)];
-  }
+  };
 
   const getColorForContact = (contactId) => {
     if (!circleColors[contactId]) {
@@ -101,9 +100,7 @@ const PersonalContact = () => {
             <Button onClick={() => handleEditContact(filteredContact.id)}>
               Edit
             </Button>
-            <ButtonDelete
-              onClick={() => handleDeleteContact(filteredContact.id)}
-            >
+            <ButtonDelete onClick={() => handleDeleteContact(filteredContact.id)}>
               Delete
             </ButtonDelete>
           </ButtonContainer>

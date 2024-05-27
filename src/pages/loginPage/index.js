@@ -39,11 +39,10 @@ const Login = () => {
   // Função para alternar a visibilidade da senha
   const togglePasswordVisibility = () => setCheck((prevState) => !prevState);
 
-  // Função para lidar com a submissão do formulário de login
   const handleLogin = async (e) => {
     e.preventDefault(); // Previne o comportamento padrão do formulário
     setIsSubmitting(true); // Define o estado de submissão como verdadeiro
-
+  
     try {
       await dispatch(login({ username, password })); // Dispara a ação de login
       setErrMsg(""); // Limpa mensagens de erro
@@ -69,6 +68,7 @@ const Login = () => {
       setIsSubmitting(false); // Define o estado de submissão como falso
     }
   };
+  
 
   return (
     <LoginContainer>
